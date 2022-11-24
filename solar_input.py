@@ -36,7 +36,7 @@ def parse_star_parameters(line, star):
     Входная строка должна иметь слеюущий формат:
     Star <радиус в пикселах> <цвет> <масса> <x> <y> <Vx> <Vy>
 
-    Здесь (x, y) — координаты зведы, (Vx, Vy) — скорость.
+    Здесь (x, y) — координаты звезды, (Vx, Vy) — скорость.
     Пример строки:
     Star 10 red 1000 1 2 3 4
 
@@ -95,7 +95,18 @@ def write_space_objects_data_to_file(output_filename, space_objects):
         for obj in space_objects:
             print(out_file, "%s %d %s %f %f %f %f %f" % (obj.type, obj.R, obj.color, obj.m, obj.x, obj.y, obj.Vx, obj.Vy))
 
+
 def save_statistics_to_file(output_filename, obj, star, physical_time):
+    """
+    Сохраняет статистику в текстовый файл.
+
+    Параметры:
+
+    **output_filename** — имя текстового файла статистики
+    **obj** — объекты планет и звёзд.
+    **star** — объект звезды.
+    **physical_time** — время симуляции.
+    """
     with open(output_filename, 'a') as out_file:
         print("%f %s %d %s %f %f %f %f %f %f %f" % (physical_time, obj.type, obj.R, obj.color, obj.m, obj.x, obj.y, obj.Vx, obj.Vy, (obj.Vx**2 + obj.Vy**2)**0.5, ((star.x - obj.x)**2 + (star.y - obj.y)**2)**0.5), file = out_file)
 

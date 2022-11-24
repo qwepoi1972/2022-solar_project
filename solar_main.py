@@ -114,6 +114,9 @@ def save_file_dialog():
 
 
 def plot():
+    """
+    Открывает побочное окно с отрисованными в нём графиками V(t), r(t), V(r).
+    """
     d_t = dict()
     d_v = dict()
     d_r = dict()
@@ -123,19 +126,20 @@ def plot():
         d_v[array_st[3]] = d_v.get(array_st[3], []) + [float(array_st[9])]
         d_r[array_st[3]] = d_r.get(array_st[3], []) + [float(array_st[10])]
     fig, ax = plt.subplots(2, 2)
+    plt.subplot(2, 2, 1)
     fig.tight_layout()
     plt.xlabel('$t, c$')  # ось Ox
     plt.ylabel('$V, \\frac{m}{s}$')  # Ось Oy
     plt.title("V(t)")
     for k in d_t.keys():
         plt.plot(d_t[k], d_v[k], color = k)
-    plt.subplot(2, 2, 2)
+    plt.subplot(2, 2, 3)
     plt.xlabel('$t, c$')  # ось Ox
     plt.ylabel('$r, m$')  # Ось Oy
     plt.title("r(t)")
     for k in d_t.keys():
         plt.plot(d_t[k], d_r[k], color = k)
-    plt.subplot(2, 2, 3)
+    plt.subplot(1, 2, 2)
     plt.xlabel('$r, c$')  # ось Ox
     plt.ylabel('$v, \\frac{m}{s}$')  # Ось Oy
     plt.title("v(r)")
