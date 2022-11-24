@@ -3,9 +3,13 @@
 
 import tkinter
 from tkinter.filedialog import *
+
+import numpy as np
+
 from solar_vis import *
 from solar_model import *
 from solar_input import *
+import matplotlib.pyplot as plt
 
 perform_execution = False
 """Флаг цикличности выполнения расчёта"""
@@ -43,6 +47,13 @@ def execution():
     if perform_execution:
         space.after(101 - int(time_speed.get()), execution)
 
+    for obj in space_objects:
+        if obj.type == "star":
+            star = obj
+    for obj in space_objects:
+        if obj.type == "planet":
+            save_statistics_to_file("stats.txt", obj, star, physical_time)
+
 
 def start_execution():
     """Обработчик события нажатия на кнопку Start.
@@ -76,6 +87,7 @@ def open_file_dialog():
     global space_objects
     global perform_execution
     perform_execution = False
+    f = open("stats.txt", "w")
     for obj in space_objects:
         space.delete(obj.image)  # удаление старых изображений планет
     in_filename = askopenfilename(filetypes=(("Text file", ".txt"),))
@@ -101,6 +113,36 @@ def save_file_dialog():
     write_space_objects_data_to_file(out_filename, space_objects)
 
 
+def plot():
+    d_t = dict()
+    d_v = dict()
+    d_r = dict()
+    for line in open("stats.txt"):
+        array_st = line.split()
+        d_t[array_st[3]] = d_t.get(array_st[3], []) + [float(array_st[0])]
+        d_v[array_st[3]] = d_v.get(array_st[3], []) + [float(array_st[9])]
+        d_r[array_st[3]] = d_r.get(array_st[3], []) + [float(array_st[10])]
+    fig, ax = plt.subplots(2, 2)
+    fig.tight_layout()
+    plt.xlabel('$t, c$')  # ось Ox
+    plt.ylabel('$V, \\frac{m}{s}$')  # Ось Oy
+    plt.title("V(t)")
+    for k in d_t.keys():
+        plt.plot(d_t[k], d_v[k], color = k)
+    plt.subplot(2, 2, 2)
+    plt.xlabel('$t, c$')  # ось Ox
+    plt.ylabel('$r, m$')  # Ось Oy
+    plt.title("r(t)")
+    for k in d_t.keys():
+        plt.plot(d_t[k], d_r[k], color = k)
+    plt.subplot(2, 2, 3)
+    plt.xlabel('$r, c$')  # ось Ox
+    plt.ylabel('$v, \\frac{m}{s}$')  # Ось Oy
+    plt.title("v(r)")
+    for k in d_v.keys():
+        plt.plot(d_r[k], d_v[k], color=k)
+    plt.show()
+
 def main():
     """Главная функция главного модуля.
     Создаёт объекты графического дизайна библиотеки tkinter: окно, холст, фрейм с кнопками, кнопки.
@@ -111,7 +153,6 @@ def main():
     global time_speed
     global space
     global start_button
-
     print('Modelling started!')
     physical_time = 0
 
@@ -137,8 +178,12 @@ def main():
 
     load_file_button = tkinter.Button(frame, text="Open file...", command=open_file_dialog)
     load_file_button.pack(side=tkinter.LEFT)
+
     save_file_button = tkinter.Button(frame, text="Save to file...", command=save_file_dialog)
     save_file_button.pack(side=tkinter.LEFT)
+
+    plot_button = tkinter.Button(frame, text="Plot", command=plot)
+    plot_button.pack(side=tkinter.LEFT)
 
     displayed_time = tkinter.StringVar()
     displayed_time.set(str(physical_time) + " seconds gone")
